@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Flashcard – English</title>
+    <style>
+        :root {
+            --card: 200px;
+            --gap: 24px;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", sans-serif;
+            background: #f4f4f4;
+            padding: var(--gap);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: var(--gap);
+        }
+
+        #searchBox {
+            display: block;
+            margin: 0 auto var(--gap);
+            padding: 8px 12px;
+            width: 260px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            font-size: 15px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(var(--card), 1fr));
+            gap: var(--gap);
+            justify-items: center;
+        }
+
+        .card,
+        .add-card {
+            width: var(--card);
+            height: var(--card);
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, .08);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-size: 15px;
+            transition: .2s;
+        }
+
+        .add-card {
+            border-style: dashed;
+            color: #888;
+            cursor: pointer;
+        }
+
+        .add-card:hover {
+            background: #f9f9f9;
+        }
+
+        .plus {
+            font-size: 48px;
+            line-height: 1;
+        }
+
+        .date {
+            margin-top: 6px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* .hidden {
+            display: none;
+        } */
+         #newForm.hidden {
+  display: none !important;
+}
+
+        #newForm {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #newForm form {
+            background: #fff;
+            padding: 24px;
+            border-radius: 8px;
+            width: 280px;
+        }
+
+        #newForm input {
+            width: 100%;
+            margin-bottom: 12px;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+
+        #newForm button {
+            margin-right: 8px;
+            padding: 6px 14px;
+        }
+
+        a.back {
+            display: block;
+            margin: var(--gap) auto;
+            text-align: center;
+            color: #007bff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>📚 Ghi chú Tiếng Anh</h1>
+    <input id="searchBox" placeholder="Tìm theo tiêu đề…">
+
+    <div class="grid" id="cardContainer">
+        <!-- Card Tạo mới luôn ở vị trí đầu -->
+        <div class="add-card" onclick="openForm()">
+            <div class="plus">+</div>
+            <small>Tạo thẻ mới</small>
+        </div>
+
+        <!-- Các thẻ có sẵn -->
+        <div class="card">
+            <strong>Function Basics</strong>
+            <div class="date">25 thg 7, 2025 · 4 nguồn</div>
+        </div>
+        <div class="card">
+            <strong>HTML & CSS Deep Dive</strong>
+            <div class="date">24 thg 7, 2025 · 7 nguồn</div>
+        </div>
+        <div class="card">
+            <strong>JavaScript Objects</strong>
+            <div class="date">23 thg 7, 2025 · 3 nguồn</div>
+        </div>
+    </div>
+
+    <!-- Form tạo mới -->
+    <div id="newForm" class="hidden">
+        <form onsubmit="addCard(event)">
+            <h3>Thêm thẻ mới</h3>
+            <input id="titleInput" placeholder="Tiêu đề" required>
+            <input id="sourceInput" placeholder="Nguồn (vd: 5 thg 7, 2025 · 3 nguồn)" required>
+            <button type="submit">Lưu</button>
+            <button type="button" onclick="closeForm();">Hủy</button>
+        </form>
+    </div>
+
+    <a class="back" href="index.html">&larr; Quay lại</a>
+
+    <script>
+        const searchBox = document.getElementById('searchBox');
+        const container = document.getElementById('cardContainer');
+        const cards = [...container.querySelectorAll('.card')]; // bỏ qua .add-card
+        const addCardBtn = container.querySelector('.add-card');
+
+        /* ========== Tìm kiếm ========== */
+        searchBox.addEventListener('input', () => {
+            const kw = searchBox.value.toLowerCase();
+            cards.forEach(c => {
+                const title = c.querySelector('strong').textContent.toLowerCase();
+                c.style.display = title.includes(kw) ? '' : 'none';
+            });
+        });
+
+        /* ========== Thêm thẻ ========== */
+
+        function hideForm() {
+            document.getElementById('newForm').classList.add('hidden');
+        }
+
+        function showForm() {
+            document.getElementById('newForm').classList.remove('hidden');
+        }
+
+        function addCard(e) {
+            e.preventDefault();
+            const title = document.getElementById('titleInput').value.trim();
+            const source = document.getElementById('sourceInput').value.trim();
+            if (!title || !source) return;
+
+            const newCard = document.createElement('div');
+            newCard.className = 'card';
+            newCard.innerHTML = `<strong>${title}</strong><div class="date">${source}</div>`;
+            container.insertBefore(newCard, addCardBtn.nextSibling); // chèn ngay sau nút “Tạo mới”
+            cards.push(newCard);
+
+            /* reset */
+            document.getElementById('titleInput').value = '';
+            document.getElementById('sourceInput').value = '';
+            closeForm();
+        }
+
+
+        function openForm() {
+            showForm();
+        }
+
+        function closeForm() {
+            hideForm();
+        }
+    </script>
+
+</body>
+
+</html>
