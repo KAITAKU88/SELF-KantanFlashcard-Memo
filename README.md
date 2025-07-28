@@ -1,0 +1,1 @@
+# SELF-KantanFlashcard-Memo
